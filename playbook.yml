@@ -1,0 +1,28 @@
+- name: Ansible Playbook to Install and Setup Apache on Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install latest version of Apache
+      apt: name=apache2 update_cache=yes state=latest
+    - name: copy index file
+      ansible.builtin.template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        mode: 0644
+    - name: modify the apache2 config file to listen on port 8080 ports config
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: "^Listen 80"
+        line: "Listen 8080"
+        state: present
+    - name: listen to port 8080
+      lineinfile:
+        path: /etc/apache2/sites-enabled/000-default.conf
+        regexp: '^<VirtualHost \*:80>'
+        line: "<VirtualHost *:8080>"
+        state: present
+    - name: start and enable apache2
+      service:
+        name: apache2
+        enabled: true
+        state: started

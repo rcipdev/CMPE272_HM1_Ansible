@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Stop apache2 service
+      service:
+        name: apache2
+        enabled: false
+        state: stopped
+    - name: uninstall apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: absent
